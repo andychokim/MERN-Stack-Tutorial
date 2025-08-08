@@ -33,18 +33,47 @@ const createWorkout = async (req, res) => {
         const workout = await workoutModel.create({title, reps, load});
         res.status(200).json(workout);
     } catch (error) {
-        res.status(404).json({error: error.message});
+        res.status(400).json({error: error.message}); // 400 for bad request, if validation fails
     }
 };
 
 // delete a workout by ID
+const deleteWorkout = async (req, res) => {
+    const { id } = req.params; // get the ID from the request parameters
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({error: 'Workout not found'}); // if ID is not valid, return 404
+    }
+
+    const workout = await workoutModel.findByIdAndDelete(id); // find the workout by ID and delete it
+
+    if (!workout) {
+        return res.status(404).json({error: 'Workout not found'}); // if not found, return 404
+    }
+    res.status(200).json(workout); // send success message
+}
 
 // update a workout by ID
+const updateWorkout = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({error: 'Workout not found'}); // if ID is not valid, return 404
+    }
+
+    const workout = await workoutModel.findByIdAndUpdate(id, req.body);
+
+    if (!workout) {
+        return res.status(404).json({error: 'Workout not found'}); // if not found, return 404
+    }
+    res.status(200).json(workout); // send success message
+}
 
 
 module.exports = {
     getWorkouts,
     getWorkout,
-    createWorkout
+    createWorkout,
+    deleteWorkout,
+    updateWorkout
 }
