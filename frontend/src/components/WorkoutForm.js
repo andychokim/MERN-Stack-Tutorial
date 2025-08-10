@@ -8,6 +8,7 @@ const WorkoutForm = () => {
     const [load, setLoad] = useState('');
     const [reps, setReps] = useState('');
     const [error, setError] = useState(null);
+    const [emptyFields, setEmptyFields] = useState([]); // State to track empty fields
 
     const handleSubmit = async (e) => {
         e.preventDefault(); // Prevent the default form submission behavior (refreshing the page)
@@ -25,6 +26,7 @@ const WorkoutForm = () => {
 
         if (!response.ok) {
             setError(json.error); // Set the error state if the response is not ok
+            setEmptyFields(json.emptyFields); // Set the empty fields state if provided
             console.error('Error adding workout:', json.error); // Log the error
         }
         
@@ -33,6 +35,7 @@ const WorkoutForm = () => {
             setLoad(''); // Clear the load input
             setReps(''); // Clear the reps input
             setError(null); // Clear any previous errors
+            setEmptyFields([]); // Clear the empty fields state
             dispatch({ type: 'ADD_WORKOUT', payload: json }); // Dispatch the new workout to the context
             console.log('New workout added:', json); // Log the new workout
         }
@@ -47,6 +50,7 @@ const WorkoutForm = () => {
                 type="text"
                 onChange={(e) => setTitle(e.target.value)}
                 value={title}
+                className={emptyFields.includes('title') ? 'error' : ''} // Add error class if title is empty
             />
 
             <label>Exercise Load(kg): </label>
@@ -54,6 +58,7 @@ const WorkoutForm = () => {
                 type="number"
                 onChange={(e) => setLoad(e.target.value)}
                 value={load}
+                className={emptyFields.includes('load') ? 'error' : ''} // Add error class if load is empty
             />
 
             <label>Number of Reps: </label>
@@ -61,6 +66,7 @@ const WorkoutForm = () => {
                 type="number"
                 onChange={(e) => setReps(e.target.value)}
                 value={reps}
+                className={emptyFields.includes('reps') ? 'error' : ''} // Add error class if reps is empty
             />
 
             <button>Add Workout</button>
